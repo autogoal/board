@@ -39,11 +39,11 @@ def main():
     if fp is None:
         return
 
-    number_features = st.sidebar.number_input("Pipeline features", 0, None, 0)
+    number_features = st.sidebar.number_input("Pipeline features", 0, None, 1)
     features = []
 
     for i in range(number_features):
-        features.append(st.sidebar.text_input("Feature %i" % i, key="feature_%i" % i))
+        features.append(st.sidebar.text_input("Feature %i" % i, key="feature_%i" % i, value="\w+=[a-zA-Z_]+"))
 
     process(fp, features)
 
