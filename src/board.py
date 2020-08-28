@@ -19,7 +19,7 @@ def main():
     st.set_option("deprecation.showfileUploaderEncoding", False)
 
     st.image(
-        str(Path(__file__).parent.parent / "img" / "autogoal-banner.png"),
+        (Path(__file__).parent.parent / "img" / "autogoal-banner.png").read_bytes(),
         # width=600,
         use_column_width=True,
     )
