@@ -9,7 +9,7 @@ from pathlib import Path
 
 st.beta_set_page_config(
     page_title="AutoGOAL Board",
-    page_icon=str(Path(__file__).parent.parent / "img" / "autogoal-logo-embedded.png"),
+    page_icon=(Path(__file__).parent.parent / "img" / "autogoal-logo-embedded.png").read_bytes(),
     layout="centered",
     initial_sidebar_state="expanded",
 )
@@ -24,7 +24,7 @@ def main():
         use_column_width=True,
     )
 
-    input_mode = st.sidebar.selectbox("Input mode", ["Upload file", "Enter path"])
+    input_mode = st.sidebar.selectbox("Input mode", ["Upload file", "Enter path", "Local file"])
 
     fp = None
 
@@ -35,6 +35,18 @@ def main():
 
     elif input_mode == "Upload file":
         fp = st.sidebar.file_uploader("Input file")
+
+    elif input_mode == "Local file":
+        path_pipelines = Path(__file__).parent.parent / "pipelines"
+        path_pipelines.mkdir(exist_ok=True)
+        files = list(map(lambda f: f.name,
+                        filter(lambda path : path.is_file(),
+                        path_pipelines.iterdir()
+                    )   )
+        )               
+        select_box = st.sidebar.selectbox("Select file",list(files))
+        if select_box:
+            fp = open(path_pipelines / select_box, "r")   
 
     if fp is None:
         return
