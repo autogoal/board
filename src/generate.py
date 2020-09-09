@@ -1,7 +1,7 @@
 import streamlit as st
 import re
 from pathlib import Path
-from io import open
+import os
 from time import sleep
 
 def main():
@@ -20,7 +20,7 @@ def main():
     path_file = path_generate / name_file
 
     if path_file.exists() and not overwrite:
-        st.error("If file exists, then confirm **Overwrite** Option")
+        st.error("If you want to overwrite the file, please confirm first")
         return
 
     if select_mode == "Clone file":
@@ -29,7 +29,24 @@ def main():
 
 def clone_mode(path_file):
 
-    original_file = st.file_uploader("Input original file")
+    input_mode = st.selectbox("Input mode", ["Upload file","Local file"])
+
+    original_file = None
+
+    if input_mode == "Upload file":
+        original_file = st.file_uploader("Upload original file")
+
+    elif input_mode == "Local file":
+        local_path = Path(__file__).parent.parent / "pipelines"
+        files = list(map(lambda f: f.name,
+                        filter(lambda path : path.is_file(),
+                        local_path.iterdir()
+                    )   )
+        )               
+        select_box = st.selectbox("Select file",list(files))
+        if select_box and select_box != path_file.name:
+            original_file = open(local_path / select_box, "r")
+    
     time_sleep = st.number_input("Set sleep time",min_value=1, value=3, step=1)
 
     if st.button("Clone") and original_file:        
@@ -40,7 +57,8 @@ def clone_mode(path_file):
             text = s+"\n"
             edit_file.write(text)
             edit_file.flush()
-            file_view.text_area("File",text, height=400)
+            os.fsync(edit_file.fileno())
+            file_view.text_area("Line",text, height=400)
 
             sleep(time_sleep)    
     
