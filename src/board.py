@@ -5,7 +5,7 @@ import altair as alt
 import re
 import pandas as pd
 from pathlib import Path
-
+import time
 
 st.beta_set_page_config(
     page_title="AutoGOAL Board",
@@ -126,9 +126,18 @@ def process(fp, features):
     max_fit = 0.0
     avg_fit = []
 
-    for i, line in enumerate(fp):
-        lines.info(f"Loading line: {i}")
-        data = json.loads(line)
+    i=0  
+    while True:
+        try:
+            line = fp.readline()
+            if re.search("finished *: *[Tt]rue",line):
+                break            
+            lines.info(f"Loading line: {i}")
+            data = json.loads(line)
+        except:
+            time.sleep(1)
+            continue
+        i+=1
 
         if "evaluating_pipeline" in data:
             fitness = data["evaluating_pipeline"].get("fitness", 0.0)
